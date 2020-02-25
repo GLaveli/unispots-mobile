@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Image, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, AsyncStorage } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, KeyboardAvoidingView, AsyncStorage } from 'react-native';
+
 import api from '../services/api';
 
 import logo from '../assets/logo.png';
 
 export default function Login({ navigation }) {
-
     const [email, setEmail] = useState('');
-    const [references, setReferences] = useState('');
+    const [referencias, setReferencias] = useState('');
 
     useEffect(() => {
         AsyncStorage.getItem('user').then(user => {
@@ -15,84 +15,73 @@ export default function Login({ navigation }) {
                 navigation.navigate('List');
             }
         });
-    }, [])
+    }, []);
 
     async function handleSubmit() {
-        const response = await api.post('/sessions', {
-            email,
+
+        const response = await api.post('sessions', {
+            email
         });
 
-        const { _id } = response.data;
+        const { _id } = response.data
 
-        if (_id) {
-            await AsyncStorage.setItem('user', _id);
-            await AsyncStorage.setItem('references', references);
+        await AsyncStorage.setItem('user', _id);
+        await AsyncStorage.setItem('referencias', referencias.toUpperCase());
 
-            navigation.navigate('List');
-        } else {
-            navigation.navigate('New');
-        }
-
-
-        console.log(_id);
-
-
-
+        navigation.navigate('List');
     }
 
-
-    return <KeyboardAvoidingView behavior="padding" style={styles.container}>
-
+    return < KeyboardAvoidingView behavior="padding" style={styles.container}>
         <Image source={logo} />
 
         <View style={styles.form}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>E-mail*</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Seu@e-mail.aqui"
+                placeholder="seu@emai.com.br"
                 placeholderTextColor="#999"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
                 value={email}
-                onChangeText={text => setEmail(text)}
+                onChangeText={setEmail}
             />
+        </View>
 
-            <Text style={styles.label}>Senha</Text>
+        <View style={styles.form}>
+            <Text style={styles.label}>Referencias</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Seu@e-mail.aqui"
+                placeholder="ex: UFSC, UDESC, IFSC"
                 placeholderTextColor="#999"
                 autoCapitalize="words"
                 autoCorrect={false}
-                value={references}
-                onChangeText={text => setReferences(text)}
+                value={referencias}
+                onChangeText={setReferencias}
             />
 
-            <TouchableOpacity onPress={handleSubmit} style={styles.button}>
-                <Text style={styles.buttonText}>Encontrar um Spot</Text>
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                <Text style={styles.buttonText}>Procurar!</Text>
             </TouchableOpacity>
         </View>
-
-
-    </KeyboardAvoidingView>
+    </ KeyboardAvoidingView>
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
     form: {
-        alignSelf: 'stretch',
+        alignSelf: "stretch",
         paddingHorizontal: 30,
-        marginTop: 30,
+
     },
     label: {
-        fontWeight: 'bold',
+        fontWeight: "bold",
         color: '#444',
-        marginBottom: 8
+        marginBottom: 8,
     },
     input: {
         borderWidth: 1,
@@ -100,7 +89,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         fontSize: 16,
         color: '#444',
-        height: 50,
+        height: 44,
         marginBottom: 20,
         borderRadius: 2,
 
@@ -108,8 +97,8 @@ const styles = StyleSheet.create({
     button: {
         height: 42,
         backgroundColor: '#8B3694',
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         borderRadius: 2,
 
     },
@@ -117,6 +106,5 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: "bold",
         fontSize: 20,
-    }
-
-})
+    },
+});

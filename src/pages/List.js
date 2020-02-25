@@ -1,39 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, AsyncStorage, SafeAreaView, Platform } from 'react-native';
+import { Text, SafeAreaView, TouchableOpacity, ScrollView, Image, StyleSheet, AsyncStorage } from 'react-native';
+
+import SpotList from '../components/SpotList';
 
 import logo from '../assets/logo.png';
 
-
-export default function List() {
-    const [references, setReferences] = useState('');
+export default function List({ navigation }) {
+    const [referencias, setReferencias] = useState([]);
 
     useEffect(() => {
-        AsyncStorage.getItem('references').then(storageReferences => {
-            const referencesArray = storageReferences.split(',').map(ref => ref.trim());
-
-            setReferences(referencesArray);
+        AsyncStorage.getItem('referencias').then(storagereferencias => {
+            const referenciasArray = storagereferencias.split(',').map(refs => refs.trim());
+            setReferencias(referenciasArray);
         })
-    })
+    }, []);
+
+    async function handleLogout() {
+
+        await AsyncStorage.setItem('user', '');
+        await AsyncStorage.setItem('referencias', '');
+
+        navigation.navigate('Login');
+    }
 
     return (
-        <SafeAreaView style={Styles.droidSafeArea}>
-            <Image style={Styles.logo} source={logo} />
-        </ SafeAreaView>
+        <SafeAreaView style={styles.container}>
+            <Image style={styles.logo} source={logo} />
+
+
+
+            <ScrollView>
+                {referencias.map(refs => <SpotList key={refs} reference={refs} />)}
+            </ScrollView>
+            <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleLogout}>
+                <Text style={styles.buttonText}>Sair</Text>
+            </TouchableOpacity>
+
+        </SafeAreaView>
     )
 }
 
-const Styles = StyleSheet.create({
-    droidSafeArea: {
-        flex: 1,
-        paddingTop: Platform.OS === 'android' ? 45 : 0
-    },
+const styles = StyleSheet.create({
     container: {
         flex: 1,
+
     },
     logo: {
-        height: 40,
+        height: 50,
         resizeMode: "contain",
         alignSelf: "center",
-        marginTop: 10,
-    }
-})
+        marginTop: 50,
+    },
+    button: {
+        height: 42,
+        backgroundColor: '#c22d19',
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 2,
+
+    },
+    buttonText: {
+        color: '#fff',
+        fontWeight: "bold",
+        fontSize: 20,
+    },
+});
