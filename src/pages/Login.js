@@ -23,7 +23,11 @@ export default function Login({ navigation }) {
             email
         });
 
-        const { _id } = response.data
+        const { _id, message } = response.data
+
+        if (message) {
+            navigation.navigate('New');
+        }
 
         await AsyncStorage.setItem('user', _id);
         await AsyncStorage.setItem('referencias', referencias.toUpperCase());
