@@ -10,9 +10,18 @@ export default function Login({ navigation }) {
     const [referencias, setReferencias] = useState('');
 
     useEffect(() => {
+
+        async function userTeste() {
+
+        } userTeste();
+
         AsyncStorage.getItem('user').then(user => {
+
             if (user) {
-                navigation.navigate('List');
+                navigation.navigate('New');
+            } else {
+
+
             }
         });
     }, []);
@@ -26,6 +35,7 @@ export default function Login({ navigation }) {
         const { _id, message } = response.data
 
         if (message) {
+            await AsyncStorage.setItem('userEmail', email);
             navigation.navigate('New');
         }
 

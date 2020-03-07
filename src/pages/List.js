@@ -19,6 +19,7 @@ export default function List({ navigation }) {
 
         await AsyncStorage.setItem('user', '');
         await AsyncStorage.setItem('referencias', '');
+        await AsyncStorage.setItem('userEmail', '');
 
         navigation.navigate('Login');
     }
