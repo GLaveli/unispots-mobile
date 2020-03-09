@@ -11,19 +11,16 @@ export default function Login({ navigation }) {
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [course, setCourse] = useState('');
-    const [tell, setTell] = useState('');
-    const [password, setPassWord] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const [cellPhone, setcellPhone] = useState('');
+    const [passWord, setpassWord] = useState('');
+    const [confirmpassWord, setConfirmpassWord] = useState('');
 
     //Itens referente a icones e estados especificos de campos
     const [secureEntry, setSecureEntry] = useState(true);
-    const [passwordView, setPasswordView] = useState('eye');
-
-
-    let a = React.createRef();
+    const [passWordView, setpassWordView] = useState('eye');
+    const [reviewText, setReviewText] = useState('Revelar Senha');
 
     useEffect(() => {
-
         AsyncStorage.getItem('userEmail').then(uEmail => {
             setEmail(uEmail);
         });
@@ -31,32 +28,59 @@ export default function Login({ navigation }) {
 
     function onIconPress() {
 
-        if (passwordView === "eye") {
-            setPasswordView("eye-off");
+        if (passWordView === "eye") {
+            setpassWordView("eye-off");
+            setReviewText("Esconder Senha ");
             setSecureEntry(false);
         } else {
-            setPasswordView("eye");
+            setpassWordView("eye");
+            setReviewText("Revelar Senha ");
             setSecureEntry(true);
         }
 
     }
 
-    async function handleSubmit() {
+    async function createUser() {
+
+        const response = await api.post('create', {
+            email,
+            name,
+            course,
+            cellPhone,
+            passWord
+        });
+
+        const { _id, message } = response.data
+
+        if (message) {
+            Alert.alert(response.data.message);
+        } else {
+            await AsyncStorage.setItem('user', _id);
+
+            
+            navigation.navigate('List');
+        }
+    }
+
+    function handleSubmit() {
         //validation
         if (name.length < 3 || name.length === '') {
             Alert.alert("O campo Nome \nprecisa de no minimo 3 digitos");
-        }
-        else if (email.length < 4 || email.length === '') {
+
+        } else if (email.length < 4 || email.length === '') {
             Alert.alert("O campo Senha \nprecisa de no minimo 4 digitos");
-        }
-        else if (tell.length < 11 || tell.length === '') {
+
+        } else if (cellPhone.length < 11 || cellPhone.length === '') {
             Alert.alert("O campo Telefone \nPrecisa ser valido!");
-        }
-        else if (password.length < 4 || password.length === '') {
+
+        } else if (passWord.length < 4 || passWord.length === '') {
             Alert.alert("O campo Senha \nprecisa de no minimo 4 digitos");
-        }
-        else if (password != confirmPassword) {
+
+        } else if (passWord != confirmpassWord) {
             Alert.alert("Os campos Senha e Confirmar Senha\nSão diferentes");
+
+        } else {
+            createUser();
         }
 
 
@@ -72,7 +96,7 @@ export default function Login({ navigation }) {
 
     return (< KeyboardAvoidingView behavior="padding" style={styles.container}>
         <Image style={styles.logo} source={logo} />
-        <Text style={styles.labelLogo}>Parece que você é novo por aqui!</Text>
+        <Text style={styles.labelLogo}>Facilite</Text>
         <Text style={styles.subLabelLogo}>Tendo um cadastro podem entrar em contato com você.</Text>
 
         <ScrollView>
@@ -87,7 +111,6 @@ export default function Login({ navigation }) {
                     autoCorrect={false}
                     value={name}
                     onChangeText={setName}
-                    onSel
                 />
                 <Text style={styles.label}>Email*</Text>
                 <TextInput
@@ -108,8 +131,8 @@ export default function Login({ navigation }) {
                     keyboardType="decimal-pad"
                     autoCapitalize="none"
                     autoCorrect={false}
-                    value={tell}
-                    onChangeText={setTell}
+                    value={cellPhone}
+                    onChangeText={setcellPhone}
                 />
                 <Text style={styles.label}>Senha*</Text>
                 <TextInput
@@ -119,13 +142,14 @@ export default function Login({ navigation }) {
                     keyboardType="name-phone-pad"
                     autoCapitalize="none"
                     autoCorrect={false}
-                    value={password}
-                    onChangeText={setPassWord}
+                    value={passWord}
+                    onChangeText={setpassWord}
                     secureTextEntry={secureEntry}
                 />
 
-                <TouchableOpacity style={styles.passIcon} onPress={onIconPress}>
-                    <Icon name={passwordView} style={styles.passIconText} />
+                <TouchableOpacity style={styles.passIconbutton} onPress={onIconPress}>
+                    <Text style={styles.passIconText}>{reviewText}</Text>
+                    <Icon name={passWordView} style={styles.passIcon} />
                 </TouchableOpacity>
 
                 <Text style={styles.label}>Confirmar Senha*</Text>
@@ -136,8 +160,8 @@ export default function Login({ navigation }) {
                     keyboardType="name-phone-pad"
                     autoCapitalize="none"
                     autoCorrect={false}
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
+                    value={confirmpassWord}
+                    onChangeText={setConfirmpassWord}
                     secureTextEntry={true}
                     secureTextEntry={secureEntry}
                 />
@@ -152,7 +176,6 @@ export default function Login({ navigation }) {
                     value={course}
                     onChangeText={setCourse}
                 />
-
             </View>
 
             <View style={styles.form}>
@@ -215,14 +238,23 @@ const styles = StyleSheet.create({
         borderRadius: 2,
 
     },
-    passIcon: {
+    passIconbutton: {
+        flexDirection: "row",
         position: "absolute",
-        top: 310,
-        right: 50,
+        alignItems: "center",
+        top: 356,
+        right: 40,
+        zIndex: 1
 
     },
     passIconText: {
+        fontSize: 15,
+        fontWeight: "bold"
+
+    },
+    passIcon: {
         fontSize: 24,
+        color: "#8B3694"
     },
     button: {
         height: 42,

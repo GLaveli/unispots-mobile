@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, KeyboardAvoidingView, AsyncStorage } from 'react-native';
+import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, KeyboardAvoidingView, AsyncStorage, Alert } from 'react-native';
 
 import api from '../services/api';
 
@@ -28,21 +28,35 @@ export default function Login({ navigation }) {
 
     async function handleSubmit() {
 
-        const response = await api.post('sessions', {
-            email
-        });
+        if (email) {
+            const falgMail = email.indexOf('@', 2);
 
-        const { _id, message } = response.data
+            if (falgMail != -1) {
 
-        if (message) {
-            await AsyncStorage.setItem('userEmail', email);
-            navigation.navigate('New');
+                const response = await api.post('sessions', {
+                    email
+                });
+
+                const { _id, message } = response.data
+
+                if (message) {
+                    await AsyncStorage.setItem('userEmail', email);
+                    await AsyncStorage.setItem('referencias', referencias.toUpperCase());
+                    navigation.navigate('New');
+                }
+
+                await AsyncStorage.setItem('user', _id);
+                await AsyncStorage.setItem('referencias', referencias.toUpperCase());
+
+                navigation.navigate('List');
+
+            } else {
+                Alert.alert("Seu email parece incorreto");
+            }
+
+        } else {
+            Alert.alert("O campo E-mail nao pode ser vazio");
         }
-
-        await AsyncStorage.setItem('user', _id);
-        await AsyncStorage.setItem('referencias', referencias.toUpperCase());
-
-        navigation.navigate('List');
     }
 
     return < KeyboardAvoidingView behavior="padding" style={styles.container}>
